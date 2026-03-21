@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWaste - Login</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* =========================================
+           Design System & Variables
+        ========================================= */
+        :root {
+            --bg-darker: #05080c;
+            --glass-bg: rgba(20, 28, 43, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(16px);
+            --accent-teal: #00f2fe;
+            --accent-purple: #4facfe;
+            --accent-blue: #0284c7;
+            --success: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-darker);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            padding: 40px 0;
+        }
+
+        /* Background Animated Blobs */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        .bg-teal { width: 400px; height: 400px; background: var(--accent-teal); top: 10%; left: 10%; }
+        .bg-purple { width: 600px; height: 600px; background: var(--accent-purple); bottom: 10%; right: 5%; animation-delay: -5s; }
+        .bg-blue { width: 500px; height: 500px; background: var(--accent-blue); top: -100px; right: 30%; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 5%) scale(1.1); }
+            100% { transform: translate(-5%, -5%) scale(0.9); }
+        }
+
+        /* Glassmorphism Container */
+        .login-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header / Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .logo i {
+            color: var(--success);
+            font-size: 32px;
+            background: rgba(16, 185, 129, 0.15);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        h2.title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        /* Role Toggle Switches */
+        .role-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .role-btn.active {
+            color: var(--text-primary);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: calc(50% - 6px);
+            height: calc(100% - 12px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            z-index: 1;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Forms */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-secondary);
+            font-size: 20px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 16px 14px 48px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--accent-purple);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.1);
+        }
+
+        .input-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            accent-color: var(--accent-purple);
+            cursor: pointer;
+        }
+
+        .forgot-pass {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .forgot-pass:hover {
+            color: var(--accent-purple);
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Background Animated Blobs -->
+    <div class="bg-shape bg-teal"></div>
+    <div class="bg-shape bg-purple"></div>
+    <div class="bg-shape bg-blue"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class='bx bx-leaf'></i>
+                <span>EcoWaste</span>
+            </div>
+            <h2 class="title">Welcome Back</h2>
+            <p class="subtitle" id="role-subtitle">Enter your Admin details</p>
+
+            <div class="role-toggle">
+                <div class="toggle-slider" id="slider"></div>
+                <button class="role-btn active" id="btn-admin" data-role="admin">Admin</button>
+                <button class="role-btn" id="btn-citizen" data-role="citizen">Citizen</button>
+            </div>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-user'></i>
+                        <input type="text" id="username" placeholder="Enter username" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-lock-alt'></i>
+                        <input type="password" id="password" placeholder="Enter password" required>
+                    </div>
+                </div>
+                
+                <div class="options-row">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="forgot-password.html" class="forgot-pass">Forgot Password?</a>
+                </div>
+
+                <div id="login-error" style="color: #ef4444; font-size: 14px; text-align: center; margin-bottom: 16px; display: none;"></div>
+
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    Login to Admin <i class='bx bx-right-arrow-alt'></i>
+                </button>
+                
+                <div style="text-align: center; margin-top: 24px; font-size: 14px;">
+                    <span style="color: var(--text-secondary);">Don't have an account?</span>
+                    <a href="signup.html" class="forgot-pass" style="margin-left: 4px;">Sign up here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnAdmin = document.getElementById('btn-admin');
+            const btnCitizen = document.getElementById('btn-citizen');
+            const slider = document.getElementById('slider');
+            const form = document.getElementById('login-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const subtitle = document.getElementById('role-subtitle');
+            
+            let currentRole = 'admin';
+
+            // Role toggle functionality
+            function switchRole(role) {
+                currentRole = role;
+                
+                if (role === 'admin') {
+                    btnAdmin.classList.add('active');
+                    btnCitizen.classList.remove('active');
+                    slider.style.transform = 'translateX(0)';
+                    subtitle.textContent = 'Enter your Admin details';
+                    submitBtn.innerHTML = "Login to Admin <i class='bx bx-right-arrow-alt'></i>";
+                } else {
+                    btnCitizen.classList.add('active');
+                    btnAdmin.classList.remove('active');
+                    // Slider moves 100% width + border offsets
+                    slider.style.transform = 'translateX(calc(100% + 12px))';
+                    subtitle.textContent = 'Enter your Citizen details';
+                    submitBtn.innerHTML = "Login to Citizen <i class='bx bx-right-arrow-alt'></i>";
+                }
+            }
+
+            btnAdmin.addEventListener('click', () => switchRole('admin'));
+            btnCitizen.addEventListener('click', () => switchRole('citizen'));
+
+            // Redirection logic on form submit
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevent standard page reload
+                
+                const errorDiv = document.getElementById('login-error');
+                if (errorDiv) errorDiv.style.display = 'none';
+
+                // Visual feedback
+                const currentText = submitBtn.innerHTML;
+                submitBtn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Authenticating...";
+                submitBtn.style.opacity = '0.8';
+                submitBtn.disabled = true;
+
+                const usernameValue = document.getElementById('username').value;
+                const passwordValue = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('http://localhost:8080/api/auth/signin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: usernameValue,
+                            password: passwordValue
+                        })
+                    });
+
+                    const data = await response.json().catch(() => ({}));
+
+                    if (response.ok && data.accessToken) {
+                        const roles = data.roles || [];
+
+                        if (currentRole === 'admin' && !roles.includes('ROLE_ADMIN')) {
+                            throw new Error('You are not authorized as Admin');
+                        }
+                        
+                        if (currentRole === 'citizen' && !roles.includes('ROLE_USER')) {
+                            throw new Error('You are not authorized as Citizen');
+                        }
+
+                        // Success
+                        localStorage.setItem('accessToken', data.accessToken);
+                        localStorage.setItem('roles', JSON.stringify(roles));
+                        if (data.username) {
+                            localStorage.setItem('username', data.username);
+                        }
+                        
+                        if (currentRole === 'admin') {
+                            window.location.href = 'dashboard/index.html';
+                        } else {
+                            window.location.href = 'citizen/index.html';
+                        }
+                    } else {
+                        // Error from API
+                        throw new Error(data.message || 'Login failed. Please check your credentials.');
+                    }
+                } catch (error) {
+                    // Restore button
+                    submitBtn.innerHTML = currentText;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.disabled = false;
+                    
+                    if (errorDiv) {
+                        errorDiv.textContent = error.message || 'Network error occurred. Please try again.';
+                        errorDiv.style.display = 'block';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

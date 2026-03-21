@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCitizen Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Animated Blobs for Glassmorphism Effect -->
+    <div class="bg-shape bg-teal"></div>
+    <div class="bg-shape bg-purple"></div>
+    <div class="bg-shape bg-blue"></div>
+
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-card">
+            <div class="logo">
+                <i class='bx bx-leaf'></i>
+                <span>EcoCitizen</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="page-home"><a href="#"><i class='bx bx-home-alt'></i><span>Home Overview</span></a></li>
+                <li data-target="page-map"><a href="#"><i class='bx bx-map-alt'></i><span>Live Collection Map</span></a></li>
+                <li data-target="page-complaints"><a href="#"><i class='bx bx-message-edit'></i><span>My Complaints</span></a></li>
+                <li style="margin-top: 40px;"><a href="../index.html" onclick="localStorage.removeItem('accessToken'); localStorage.removeItem('roles'); localStorage.removeItem('username');" style="color: var(--critical);"><i class='bx bx-log-out'></i><span>Logout</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Base -->
+        <div class="main-content">
+            <!-- Top Navigation (Persistent) -->
+            <header class="top-nav glass-card">
+                <div class="nav-left">
+                    <h1 id="page-title">Welcome Back</h1>
+                    <p class="subtitle" id="page-subtitle">Your neighborhood waste management overview</p>
+                </div>
+                <div class="nav-right">
+                    <div class="profile-action">
+                        <button class="icon-btn"><i class='bx bx-bell'></i><span class="badge">1</span></button>
+                        <div class="profile-pic">
+                            <img src="https://ui-avatars.com/api/?name=Citizen+User&background=10B981&color=fff" alt="Citizen profile">
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page 1: Home Overview (Default) -->
+            <div id="page-home" class="page-section active">
+                <div class="dashboard-grid">
+                    <div class="col-main">
+                        <!-- Quick Map Preview -->
+                        <div class="map-card glass-card" style="min-height: 300px;">
+                            <div class="card-header">
+                                <h2>Today's Collection Status</h2>
+                                <button class="filter-btn active" onclick="document.querySelector('[data-target=\'page-map\']').click()">View Full Map</button>
+                            </div>
+                            <div class="map-container" style="min-height: 250px;">
+                                <div class="map-overlay">
+                                    <div class="map-vehicle" style="top: 30%; left: 40%;">
+                                        <i class='bx bxs-truck'></i>
+                                    </div>
+                                    <div class="map-marker normal" style="top: 60%; left: 50%;">
+                                        <div class="pulse"></div>
+                                        <i class='bx bxs-trash'></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- My Activity Summary -->
+                        <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
+                            <div class="stat-card glass-card">
+                                <div class="stat-icon info-bg"><i class='bx bx-refresh'></i></div>
+                                <div class="stat-details">
+                                    <h3>Next Pickup</h3>
+                                    <div class="stat-value"><span class="number" style="font-size: 24px;">Tomorrow, 8 AM</span></div>
+                                    <p class="stat-desc">Recyclables & General Route</p>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-card">
+                                <div class="stat-icon warning-bg"><i class='bx bx-message-detail'></i></div>
+                                <div class="stat-details">
+                                    <h3>Active Complaints</h3>
+                                    <div class="stat-value">
+                                        <span class="number">1</span>
+                                        <span class="trend neutral">In Progress</span>
+                                    </div>
+                                    <p class="stat-desc">Update on Ticket #402</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (Neighborhood Alerts) -->
+                    <aside class="col-side">
+                        <div class="alerts-card glass-card">
+                            <div class="card-header border-bottom">
+                                <h2>Neighborhood Alerts</h2>
+                            </div>
+                            <div class="alerts-list">
+                                <div class="alert-item warning">
+                                    <div class="alert-icon"><i class='bx bxs-error'></i></div>
+                                    <div class="alert-content">
+                                        <h4>Schedule Delay</h4>
+                                        <p>Traffic delay for today's general waste pickup in Sector 4.</p>
+                                        <span class="time">30 mins ago</span>
+                                    </div>
+                                </div>
+                                <div class="alert-item info">
+                                    <div class="alert-icon"><i class='bx bxs-info-circle'></i></div>
+                                    <div class="alert-content">
+                                        <h4>Electronic Recycling Drive</h4>
+                                        <p>Community center is accepting e-waste this weekend.</p>
+                                        <span class="time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- Page 2: Live Map -->
+            <div id="page-map" class="page-section">
+                <div class="map-card glass-card" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="card-header">
+                        <h2>Live Collection Map</h2>
+                        <div class="controls">
+                            <button class="filter-btn active">My Neighborhood</button>
+                            <button class="filter-btn">City View</button>
+                        </div>
+                    </div>
+                    <div class="map-container" style="flex: 1; min-height: 500px;">
+                        <div class="map-overlay">
+                            <!-- Various markers -->
+                            <div class="map-vehicle" style="top: 45%; left: 50%;"><i class='bx bxs-truck'></i></div>
+                            <div class="map-marker normal" style="top: 20%; left: 30%;"><div class="pulse"></div><i class='bx bxs-trash'></i></div>
+                            <div class="map-marker warning" style="top: 60%; left: 70%;"><div class="pulse"></div><i class='bx bxs-trash'></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 3: Complaints -->
+            <div id="page-complaints" class="page-section">
+                <div class="complaints-grid">
+                    <!-- Left: Submit Form -->
+                    <div class="glass-card submit-card">
+                        <div class="card-header border-bottom">
+                            <h2><i class='bx bx-plus-circle'></i> Submit a Complaint</h2>
+                        </div>
+                        <form id="complaint-form" class="complaint-form">
+                            <div class="input-group">
+                                <label>Category</label>
+                                <select required>
+                                    <option value="">Select an issue type...</option>
+                                    <option value="overflow">Bin Overflow</option>
+                                    <option value="missed">Missed Pickup</option>
+                                    <option value="damage">Damaged Bin</option>
+                                    <option value="illegal">Illegal Dumping</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Location</label>
+                                <div class="input-wrapper">
+                                    <i class='bx bx-map'></i>
+                                    <input type="text" placeholder="E.g. 123 Main St, near the park" required>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Description</label>
+                                <textarea rows="4" placeholder="Provide details about the issue..." required></textarea>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Attach Image (Optional)</label>
+                                <div class="file-upload">
+                                    <input type="file" id="file" hidden>
+                                    <button type="button" class="upload-btn" onclick="document.getElementById('file').click()">
+                                        <i class='bx bx-upload'></i> Choose Photo
+                                    </button>
+                                    <span class="file-name">No file chosen</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn" id="submit-complaint-btn">
+                                Submit Complaint <i class='bx bx-send'></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right: History -->
+                    <div class="glass-card history-card">
+                        <div class="card-header border-bottom">
+                            <h2><i class='bx bx-history'></i> My Complaint History</h2>
+                        </div>
+                        <div class="complaints-list" id="complaints-list">
+                            <!-- Complaint Item -->
+                            <div class="complaint-item">
+                                <div class="c-header">
+                                    <span class="c-id">#TKT-402</span>
+                                    <span class="badge in-progress">In Progress</span>
+                                </div>
+                                <h4>Missed Pickup</h4>
+                                <p class="c-loc"><i class='bx bx-map'></i> Sector 4 Residential</p>
+                                <p class="c-desc">Trash was not collected yesterday despite being put out on time.</p>
+                                <span class="c-date">Submitted: Oct 12, 2023</span>
+                            </div>
+
+                            <!-- Complaint Item -->
+                            <div class="complaint-item">
+                                <div class="c-header">
+                                    <span class="c-id">#TKT-385</span>
+                                    <span class="badge resolved">Resolved</span>
+                                </div>
+                                <h4>Damaged Public Bin</h4>
+                                <p class="c-loc"><i class='bx bx-map'></i> Central Park South Gate</p>
+                                <p class="c-desc">The lid is completely broken off.</p>
+                                <span class="c-date">Submitted: Sep 28, 2023</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
