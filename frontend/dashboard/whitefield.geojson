@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Whitefield Ward"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.7121, 12.9711],
+            [77.7289, 12.9899],
+            [77.7511, 12.9835],
+            [77.7601, 12.9631],
+            [77.7501, 12.9511],
+            [77.7315, 12.9535],
+            [77.7121, 12.9711]
+          ]
+        ]
+      }
+    }
+  ]
+}

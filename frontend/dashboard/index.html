@@ -12,8 +12,8 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Mapbox & Turf CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
 </head>
 <body>
     <!-- Background Animated Blobs for Glassmorphism Effect -->
@@ -205,12 +205,28 @@
             </div>
 
             <!-- Page 3: Vehicles -->
-            <div id="page-vehicles" class="page-section">
-                <div class="glass-card placeholder-page">
-                    <div class="placeholder-content">
-                        <i class='bx bx-car'></i>
-                        <h2>Fleet Management</h2>
-                        <p>Track delivery vehicles, view maintenance schedules, and monitor driver performance.</p>
+            <div id="page-vehicles" class="page-section" style="height: 100%;">
+                <div style="display: flex; flex-direction: column; gap: 20px; height: 100%;">
+                    <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <div class="glass-card" style="padding: 16px 24px; display: flex; align-items: center; gap: 16px; min-width: 220px; border-left: 4px solid #10b981;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16,185,129,0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 24px;"><i class='bx bx-water'></i></div>
+                                <div><span style="display:block; font-size: 24px; font-weight: 700; color: #10b981; line-height: 1;" id="active-wet-count">0</span><span style="font-size: 13px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Wet Fleet Active</span></div>
+                            </div>
+                            <div class="glass-card" style="padding: 16px 24px; display: flex; align-items: center; gap: 16px; min-width: 220px; border-left: 4px solid #3b82f6;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.15); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 24px;"><i class='bx bx-package'></i></div>
+                                <div><span style="display:block; font-size: 24px; font-weight: 700; color: #3b82f6; line-height: 1;" id="active-dry-count">0</span><span style="font-size: 13px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Dry Fleet Active</span></div>
+                            </div>
+                        </div>
+                        <button id="toggle-fullscreen-map" class="action-btn" style="padding: 12px 24px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600;"><i class='bx bx-fullscreen'></i> Full Screen Map</button>
+                    </div>
+                    
+                    <div id="fleet-list" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;">
+                        <!-- Automatically populated horizontal vehicle list injected here -->
+                    </div>
+
+                    <div id="vehicles-map-container" style="flex: 1; min-height: 60vh; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <!-- Map appended here structurally bounding `width: 100%`, `height: 100%` natively -->
                     </div>
                 </div>
             </div>
@@ -245,13 +261,88 @@
                 </div>
             </div>
 
-            <!-- Page 5: Reports -->
+            <!-- Page 5: Reports (Analytics) -->
             <div id="page-reports" class="page-section">
-                <div class="glass-card placeholder-page">
-                    <div class="placeholder-content">
-                        <i class='bx bx-bar-chart-alt-2'></i>
-                        <h2>Analytics & Reports</h2>
-                        <p>View sustainability metrics, collection rates, and cost analysis.</p>
+                <!-- Row 1: KPI Core Metrics (Fleet & Sustainability) -->
+                <div class="stats-row" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon info-bg"><i class='bx bx-recycle'></i></div>
+                        <div class="stat-details">
+                            <h3>Total Processed</h3>
+                            <div class="stat-value"><span class="number" id="adm-total-waste">128</span> <span style="font-size:14px;">Tons</span></div>
+                            <p class="stat-desc">This Month</p>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon success-bg"><i class='bx bx-car'></i></div>
+                        <div class="stat-details">
+                            <h3>Active Fleet</h3>
+                            <div class="stat-value"><span class="number" id="adm-active-fleet">5</span> <span style="font-size:14px;">Vehicles</span></div>
+                            <p class="stat-desc">3 Wet / 2 Dry</p>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon warning-bg"><i class='bx bx-leaf'></i></div>
+                        <div class="stat-details">
+                            <h3>CO2 Reduction</h3>
+                            <div class="stat-value"><span class="number" id="adm-co2-red">4,200</span> <span style="font-size:14px;">kg</span></div>
+                            <p class="stat-desc">Saved vs landfill</p>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon danger-bg"><i class='bx bx-line-chart'></i></div>
+                        <div class="stat-details">
+                            <h3>Fleet Efficiency</h3>
+                            <div class="stat-value"><span class="number" id="adm-efficiency">89</span>%</div>
+                            <p class="stat-desc">Optimized Routes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Main Analysis Charts -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <!-- Complaints Heat Trend (Line Chart) -->
+                    <div class="glass-card" style="padding: 24px;">
+                        <h3 style="margin-bottom: 20px; color: var(--text-primary); font-size: 16px; font-weight: 600;"><i class='bx bx-trending-up' style="color: #3b82f6; margin-right: 6px;"></i> Complaints Heat Trend</h3>
+                        <div style="height: 300px; width: 100%; position: relative;">
+                            <canvas id="adm-timeline-chart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Resolution Performance (Donut Chart) -->
+                    <div class="glass-card" style="padding: 24px;">
+                        <h3 style="margin-bottom: 20px; color: var(--text-primary); font-size: 16px; font-weight: 600;"><i class='bx bx-check-shield' style="color: #10b981; margin-right: 6px;"></i> Resolution Performance</h3>
+                        <div style="height: 300px; width: 100%; position: relative;">
+                            <canvas id="adm-status-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: GeoJSON Analytics & Fleet Split & Smart Insights -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: stretch;">
+                    <!-- Area-wise Complaints (Bar Chart) -->
+                    <div class="glass-card" style="padding: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--text-primary); font-size: 15px; font-weight: 600;"><i class='bx bx-map-alt' style="color: #f59e0b; margin-right: 6px;"></i> Area-wise Complaints</h3>
+                        <div style="height: 200px; width: 100%; position: relative;">
+                            <canvas id="adm-area-bar-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Fleet Usage: Wet vs Dry (Pie Chart) -->
+                    <div class="glass-card" style="padding: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--text-primary); font-size: 15px; font-weight: 600;"><i class='bx bx-car' style="color: #ef4444; margin-right: 6px;"></i> Cargo Split (Trips)</h3>
+                        <div style="height: 200px; width: 100%; position: relative;">
+                            <canvas id="adm-fleet-pie-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Smart Analytics Insights (Admin) -->
+                    <div class="glass-card" style="padding: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--text-primary); font-size: 15px; font-weight: 600;"><i class='bx bx-brain' style="color: #8b5cf6; margin-right: 6px;"></i> Smart Insights</h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239,68,68,0.05); border-left: 3px solid #ef4444; font-size: 13px; color: var(--text-secondary);"><b style="color:var(--text-primary);">Hotspot Detected</b><br>Zone A has highest open complaints.</div>
+                            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(245,158,11,0.05); border-left: 3px solid #f59e0b; font-size: 13px; color: var(--text-secondary);"><b style="color:var(--text-primary);">Volume Spike</b><br>Dry waste routing increasing in last 3 days.</div>
+                            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(16,185,129,0.05); border-left: 3px solid #10b981; font-size: 13px; color: var(--text-secondary);"><b style="color:var(--text-primary);">Fleet Boost</b><br>Resolution time improved by 20% today.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -270,6 +361,44 @@
         </div>
     </div>
 
+    <!-- Admin Verification Popup Modal -->
+    <div id="admin-popup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div class="glass-card" style="width: 90%; max-width: 420px; padding: 28px; position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+            <span id="close-admin-modal" style="position: absolute; top: 16px; right: 20px; font-size: 26px; cursor: pointer; color: var(--text-secondary); transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-secondary)'">&times;</span>
+            <h2 style="margin-bottom: 24px; font-size: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;"><i class='bx bx-check-shield' style="color: #10b981; font-size: 22px;"></i> Verify Resolution</h2>
+            
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="font-size: 13px; margin-bottom: 8px; display: block; color: var(--text-secondary); font-weight: 500;">Attach Image Proof <span style="color: #ef4444;">*</span></label>
+                <div class="file-upload" style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1);">
+                    <input type="file" id="admin-modal-file" accept="image/*" hidden>
+                    <button type="button" class="upload-btn" onclick="document.getElementById('admin-modal-file').click()" style="padding: 8px 14px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; color: #3b82f6; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                        <i class='bx bx-upload'></i> Browse...
+                    </button>
+                    <span id="admin-modal-file-name" style="font-size: 13px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">No file chosen</span>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 24px;">
+                <label style="font-size: 13px; margin-bottom: 8px; display: block; color: var(--text-secondary); font-weight: 500;">Exact GPS Coordinates <span style="color: #ef4444;">*</span></label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="button" id="admin-modal-geo-btn" style="flex: 1; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.1);">
+                        <i class='bx bx-target-lock' style="font-size: 18px;"></i> Use My Current Location
+                    </button>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin: 0; white-space: nowrap;"><i class='bx bx-info-circle'></i> Click map to select</p>
+                </div>
+                <div id="admin-modal-coords-display" style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); text-align: center; display: none; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                    <i class='bx bx-check-circle' style="color: #10b981;"></i> Location Captured: <br>
+                    <span id="admin-modal-lat-val" style="color: #fff; font-weight: 500;"></span>, <span id="admin-modal-lng-val" style="color: #fff; font-weight: 500;"></span>
+                </div>
+                <div id="admin-modal-map" style="height: 180px; width: 100%; border-radius: 8px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.1); z-index: 1;"></div>
+            </div>
+
+            <button type="button" id="admin-modal-confirm-submit" style="width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--success); color: white; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                Confirm Resolution <i class='bx bx-check-double'></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Image Preview Modal -->
     <div id="image-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
         <span onclick="document.getElementById('image-modal').style.display='none'" style="position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; font-weight: bold; transition: 0.3s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='white'">&times;</span>
@@ -277,7 +406,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

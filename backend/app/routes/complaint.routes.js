@@ -12,4 +12,5 @@ module.exports = function(app) {
   app.post("/api/complaints", controller.createComplaint);
   app.get("/api/complaints", controller.getComplaints);
   app.put("/api/complaints/:id", controller.updateComplaintStatus);
+  app.post("/api/complaints/:id/feedback", controller.addFeedback);
 };
